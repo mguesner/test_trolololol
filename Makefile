@@ -6,10 +6,11 @@ OBJ = main.o\
 	  do_father.o\
 	  wait_for_syscall.o\
 	  show_syscall.o\
-	  get_reg.o
+	  get_reg.o\
+	  get_arg.o
 
 
-CC = clang -g -Wall -Wextra -Werror
+CC = clang -g -O3 -Wall -Wextra -Werror
 
 all: $(NAME)
 
