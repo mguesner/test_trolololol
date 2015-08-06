@@ -23,7 +23,7 @@ typedef struct user_regs_struct t_regs;
 void	do_child(int argc, char **argv);
 void	ft_error(char *msg, int error);
 void	do_father(int child);
-int		wait_for_syscall(int child, int ret);
+int		wait_for_syscall(int child, int ret, int *status);
 struct syscall_entry	show_syscall(int child);
 t_regs	get_regs(int child);
 long	get_arg(t_regs regs, int num);
