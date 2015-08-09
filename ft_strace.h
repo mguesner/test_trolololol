@@ -27,5 +27,8 @@ int		wait_for_syscall(int child, int ret, int *status);
 struct syscall_entry	show_syscall(int child);
 t_regs	get_regs(int child);
 long	get_arg(t_regs regs, int num);
+void	pre_exec(int child);
+char	*read_string(pid_t child, long addr);
+char *read_string_tab(int child, long addr);
 
 #endif

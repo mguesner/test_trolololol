@@ -12,7 +12,7 @@ struct syscall_entry	show_syscall(int child)
 	t_regs regs = get_regs(child);
 	struct syscall_entry syscall = syscalls[regs.orig_rax];
 	fprintf(stderr, "%s(", syscall.name);
-	// for (int i = 0; i < syscall.nargs; ++i)
-	// 	printf("%ld%s", get_arg(regs, i), i == syscall.nargs - 1 ? "" : ", ");
+	for (int i = 0; i < syscall.nargs; ++i)
+		fprintf(stderr, "%ld%s", get_arg(regs, i), i == syscall.nargs - 1 ? "" : ", ");
 	return syscall;
 }

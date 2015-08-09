@@ -7,7 +7,10 @@ OBJ = main.o\
 	  wait_for_syscall.o\
 	  show_syscall.o\
 	  get_reg.o\
-	  #get_arg.o
+	  get_arg.o\
+	  pre_exec.o\
+	  read_string.o\
+	  read_string_tab.o
 
 
 CC = clang -g -O3 -Wall -Wextra -Werror
