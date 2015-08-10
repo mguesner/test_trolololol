@@ -4,13 +4,13 @@
 #include <stdlib.h>
 #include "ft_strace.h"
 
-void pre_exec(int child)
+void pre_exec(int child, sigset_t set1, sigset_t set2)
 {
 	int status;
 	int ret = 0;
 	while (1)
 	{
-		if ((ret = wait_for_syscall(child, ret, &status)) == -1)
+		if ((ret = wait_for_syscall(child, ret, &status, set1, set2)) == -1)
 			break;
 		t_regs regs = get_regs(child);
 		char *arg1 = read_string(child, get_arg(regs, 0));
@@ -23,7 +23,7 @@ void pre_exec(int child)
 			exit(0);
 		}
 		// fprintf(stderr, "banane\n");
-		if ((ret = wait_for_syscall(child, ret, &status)) == -1)
+		if ((ret = wait_for_syscall(child, ret, &status, set1 , set2)) == -1)
 			break;
 		t_regs regs2 = get_regs(child);
 		if (regs2.rax == 0)

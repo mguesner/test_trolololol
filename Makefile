@@ -10,7 +10,8 @@ OBJ = main.o\
 	  get_arg.o\
 	  pre_exec.o\
 	  read_string.o\
-	  read_string_tab.o
+	  read_string_tab.o\
+	  init_sig.o\
 
 
 CC = clang -g -O3 -Wall -Wextra -Werror
