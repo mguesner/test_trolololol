@@ -12,6 +12,7 @@ OBJ = main.o\
 	  read_string.o\
 	  read_string_tab.o\
 	  init_sig.o\
+	  do_father_c.o
 
 
 CC = clang -g -O3 -Wall -Wextra -Werror

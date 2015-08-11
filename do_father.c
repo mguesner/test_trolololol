@@ -14,10 +14,10 @@ void do_father(int child)
 	sigset_t set1;
 	sigset_t set2;
 	waitpid(child, &status, WUNTRACED);
-	init_sig(&set1, &set2);
 	// a modifier
 	if (!WIFSTOPPED(status))
 		exit(-1);
+	init_sig(&set1, &set2);
 	ptrace(PTRACE_SEIZE, child, 0, 0);
 	ptrace(PTRACE_SETOPTIONS, child, 0, PTRACE_O_TRACESYSGOOD);
 	pre_exec(child, set1, set2);

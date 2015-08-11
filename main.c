@@ -21,8 +21,10 @@ int main(int argc, char **argv)
     }
 	else if (!child)
         do_child(argc - push, argv + push);
-	else f (push == 1)
+	else if (push == 1)
         do_father(child);
+    else
+    	do_father_c(child);
     return 0;
 }
 
