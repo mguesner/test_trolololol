@@ -44,9 +44,7 @@ void do_father(int child)
 		}
 		else
 		{
-			if (syscall.rtype == TYPE_STRING)
-				fprintf(stderr, ") = %s\n",(char *)regs.rax);
-			else if (syscall.rtype == TYPE_PTR)
+			if (syscall.rtype == TYPE_PTR || syscall.rtype == TYPE_STRING)
 				fprintf(stderr, ") = %p\n",(void *)regs.rax);
 			else
 				fprintf(stderr, ") = %llu\n",regs.rax);
