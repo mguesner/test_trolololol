@@ -11,7 +11,7 @@
 
 extern struct syscall_entry syscalls[];
 
-void maj_list(t_list_begin *list, int syscall, int chrono)
+void maj_list(t_list_begin *list, int syscall, int chrono, int error)
 {
 	t_list *it;
 	it = list->begin;
@@ -24,12 +24,17 @@ void maj_list(t_list_begin *list, int syscall, int chrono)
 	if (it)
 	{
 		it->seconds += (float)chrono / 1000000.;
+		it->calls++;
+		if (error)
+			it->errors++;
 	}
 	else
 	{
 		it = malloc(sizeof (t_list));
 		it->seconds = (float)chrono / 1000000.;
 		it->syscall = syscall;
+		it->calls = 1;
+		it->errors = error;
 		it->next = NULL;
 		if (list->end)
 		{
@@ -68,6 +73,8 @@ void do_father_c(int child)
 		struct rusage rusage;
 	t_list_begin list;
 	bzero(&list, sizeof(t_list_begin));
+	float total = 0;
+	int total_calls = 0;
 	while (1)
 	{
 		ptrace(PTRACE_SYSCALL, child, 0, sig);
@@ -91,13 +98,22 @@ void do_father_c(int child)
 		sigprocmask(SIG_BLOCK, &set2, 0);
 		if (WIFEXITED(status) || WIFSIGNALED(status))
 			break ;
+		regs = get_regs(child);
+		int error = 0;
+		if (regs.rax >= -(unsigned long long)4095)
+			error = 1;
 		chrono = rusage.ru_stime.tv_usec - chrono;
-		maj_list(&list, regs.orig_rax, chrono);
+		total += chrono;
+		maj_list(&list, regs.orig_rax, chrono, error);
+		total_calls++;
 	}
+	total  = total / 1000000;
+	fprintf(stderr, "%% time     seconds  usecs/call     calls    errors syscall\n------ ----------- ----------- --------- --------- ----------------\n");
 	t_list *it = list.begin;
 	while (it)
 	{
-		printf("%f\t\t%s\n", it->seconds, syscalls[it->syscall].name);
+		fprintf(stderr, "%6.2f %11f %11d %9d %9d %s\n", it->seconds  / total * 100, it->seconds, (int)(it->seconds / it->calls * 1000000), it->calls, it->errors, syscalls[it->syscall].name);
 		it = it->next;
 	}
+	fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n%6.2f %11f             %9d        11 total\n", 100., total, total_calls);
 }

@@ -21,9 +21,9 @@ struct syscall_entry
 
 typedef struct 		s_list
 {
-	float prc_time;
+	// float prc_time;
 	float seconds;
-	int usecs_per_call;
+	// int usecs_per_call;
 	int calls;
 	int errors;
 	int syscall;

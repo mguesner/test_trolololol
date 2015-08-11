@@ -6,7 +6,7 @@
 int main()
 {
 	std::regex reg_syscalls("^#define\\s+__NR_(\\w+)\\s+(\\d+)");
-	std::regex reg_proto("^\\s*extern\\s+([\\w\\s_]+[ \\*])([\\w]+)\\s[(]([\\w\\s_*,.]+)[)]");
+	std::regex reg_proto("^\\s*extern\\s+([\\w\\s_]+[ \\*])([\\w]+)\\s[(]([\\w\\s\\(\\)\\[\\]_*,.]+)[)]");
 	// std::regex reg_args("^[\\w\\s_#]*asmlinkage long sys_(\\w+)[(]([\\w\\s_*,]+)[)]");
 	std::ifstream sycalls_file("/usr/include/x86_64-linux-gnu/asm/unistd_64.h");
 	std::map<int, std::string> syscalls;
@@ -31,6 +31,7 @@ int main()
 	std::ifstream headers("header_list");
 	while (headers.good())
 	{
+
 		std::string line;
 		std::getline(headers, line);
 		std::ifstream header(line);
@@ -49,10 +50,14 @@ int main()
 					ignore = false;
 				continue;
 			}
-			currentLine = currentLine + line;
+			if (line.find("extern") == 0)
+				currentLine = line;
+			else
+				currentLine = currentLine + line;
 			// std::cout << currentLine.find(';') << std::endl;
 			if (currentLine.find(';') == std::string::npos)
 				continue;
+				std::cout << currentLine << std::endl;
 			// std::cout << currentLine << std::endl;
 			std::smatch m;
 			if (regex_search(currentLine, m, reg_proto))
@@ -106,7 +111,7 @@ int main()
 	// 	// std::cout << line << std::endl;
 	// }
 	std::ofstream file("syscallenv.h");
-	file << "#ifndef SYSCALLENV_H\n#define SYSCALLENV_H\n\nenum ret_type\n{\n\tTYPE_NONE,\n\tTYPE_PTR,\n\tTYPE_STRING,\n\tTYPE_VALUE\n};\n\nstruct syscall_entry syscalls[] = {\n";
+	file << "#ifndef SYSCALLENV_H\n#define SYSCALLENV_H\n\nstruct syscall_entry syscalls[] = {\n";
 	for (auto elem:syscalls)
 	{
 		std::string syscall = elem.second;
@@ -115,4 +120,5 @@ int main()
 		// std::cout << num << " -> " <<  syscall << " have " << args[syscall] << " parameter" << std::endl;
 		
 	}
+	file << "};\n\n#endif\n";
 }
