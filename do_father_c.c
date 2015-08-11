@@ -149,7 +149,6 @@ void do_father_c(int child)
 		}
 		t_regs regs = get_regs(child);
 		int chrono = rusage.ru_stime.tv_usec;
-		printf("%d -> ", chrono);
 		sigprocmask(SIG_SETMASK, &set1, 0);
 		ptrace(PTRACE_SYSCALL, child, 0, sig);
 		// gettimeofday(&tv_before,NULL);
@@ -167,7 +166,6 @@ void do_father_c(int child)
 			continue;
 		start = 0;
 		chrono = rusage.ru_stime.tv_usec - chrono;
-		printf("%ld\n", rusage.ru_stime.tv_usec);
 		total += chrono;
 		maj_list(&list, syscall, chrono, error);
 		total_calls++;
