@@ -49,9 +49,68 @@ void maj_list(t_list_begin *list, int syscall, int chrono, int error)
 	}
 }
 
+t_list *get_half(t_list *list)
+{
+	if (!list)
+		return list;
+	t_list *slow = list;
+	t_list *fast = slow;
+	while (fast->next && fast->next->next)
+	{
+		slow = slow->next;
+		fast = fast->next->next;
+	}
+	return slow;
+}
+
+t_list *merge(t_list *lst_a, t_list *lst_b)
+{
+	t_list **begin = malloc (sizeof(*begin));
+	t_list *curr;
+	if (lst_a->seconds < lst_b->seconds)
+	{
+		*begin = lst_b;
+			lst_b = lst_b->next;
+	}
+	else
+	{
+		*begin = lst_a;
+			lst_a = lst_a->next;
+	}
+	curr = *begin;
+	while (lst_a && lst_b)
+	{
+		if (lst_a->seconds < lst_b->seconds)
+		{
+			curr->next = lst_b;
+			lst_b = lst_b->next;
+		}
+		else
+		{
+			curr->next = lst_a;
+			lst_a = lst_a->next;
+		}
+		curr = curr->next;
+
+	}
+	curr->next = lst_a ? lst_a : lst_b;
+	return *begin;
+}
+
+t_list *merge_sort(t_list *list)
+{
+	if (!list || !list->next)
+		return list;
+	t_list *half = get_half(list);
+	t_list *mid_list = half->next;
+	half->next = NULL;
+	return (merge(merge_sort(list), merge_sort(mid_list)));
+}
+
 void do_father_c(int child)
 {
 	int status;	
+	int start = 1;
 	sigset_t set1;
 	sigset_t set2;
 	sigemptyset(&set1);
@@ -90,6 +149,7 @@ void do_father_c(int child)
 		}
 		t_regs regs = get_regs(child);
 		int chrono = rusage.ru_stime.tv_usec;
+		printf("%d -> ", chrono);
 		sigprocmask(SIG_SETMASK, &set1, 0);
 		ptrace(PTRACE_SYSCALL, child, 0, sig);
 		// gettimeofday(&tv_before,NULL);
@@ -99,17 +159,22 @@ void do_father_c(int child)
 		if (WIFEXITED(status) || WIFSIGNALED(status))
 			break ;
 		regs = get_regs(child);
+		int syscall = regs.orig_rax;
 		int error = 0;
 		if (regs.rax >= -(unsigned long long)4095)
 			error = 1;
+		if (start && syscall == 59 && error)
+			continue;
+		start = 0;
 		chrono = rusage.ru_stime.tv_usec - chrono;
+		printf("%ld\n", rusage.ru_stime.tv_usec);
 		total += chrono;
-		maj_list(&list, regs.orig_rax, chrono, error);
+		maj_list(&list, syscall, chrono, error);
 		total_calls++;
 	}
 	total  = total / 1000000;
 	fprintf(stderr, "%% time     seconds  usecs/call     calls    errors syscall\n------ ----------- ----------- --------- --------- ----------------\n");
-	t_list *it = list.begin;
+	t_list *it = merge_sort(list.begin);
 	while (it)
 	{
 		fprintf(stderr, "%6.2f %11f %11d %9d %9d %s\n", it->seconds  / total * 100, it->seconds, (int)(it->seconds / it->calls * 1000000), it->calls, it->errors, syscalls[it->syscall].name);
