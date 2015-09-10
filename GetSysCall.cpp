@@ -83,7 +83,7 @@ int main()
 							retValue[num] = 1;
 						else
 							retValue[num] = 3;
-						std::cout << "syscall : " << syscall << " -> " << m[0] << std::endl;
+						// std::cout << "syscall : " << syscall << " -> " << m[0] << std::endl;
 						break;
 					}
 				}

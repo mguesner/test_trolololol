@@ -62,8 +62,8 @@ int wait_for_syscall(int child, int sig, int *status, sigset_t set1, sigset_t se
         fprintf(stderr, "--- %s {si_signo=%s, si_code=%d, si_pid=%d, si_uid=%d, si_value={sival_int=%d, sival_ptr=%p} ---\n", signaux[WSTOPSIG(*status)]
             , signaux[siginfo.si_signo], siginfo.si_code, siginfo.si_pid, siginfo.si_uid, siginfo.si_value.sival_int, siginfo.si_value.sival_ptr);
     else if (WSTOPSIG(*status) == SIGCHLD)
-        fprintf(stderr, "--- %s {si_signo=%s, si_code=%d, si_pid=%d, si_uid=%d, si_status=%d} ---\n", signaux[WSTOPSIG(*status)]
-            , signaux[siginfo.si_signo], siginfo.si_code, siginfo.si_pid, siginfo.si_uid, siginfo.si_status);
+        fprintf(stderr, "--- %s {si_signo=%s, si_code=%d, si_pid=%d, si_status=%d, si_utime=%ld, si_stime=%ld} ---\n", signaux[WSTOPSIG(*status)]
+            , signaux[siginfo.si_signo], siginfo.si_code, siginfo.si_pid, siginfo.si_status, siginfo.si_utime, siginfo.si_stime);
     else if (WSTOPSIG(*status) == SIGIO)
         fprintf(stderr, "--- %s {si_signo=%s, si_code=%d, si_band=%d} ---\n", signaux[WSTOPSIG(*status)]
             , signaux[siginfo.si_signo], siginfo.si_code, (int)siginfo.si_band);
